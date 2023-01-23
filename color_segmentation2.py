@@ -1,7 +1,7 @@
 import numpy as np
 import cv2
 
-img = cv2.imread("C:\\Users\\nickf\\OneDrive\\Bureau\\pool_table\\pool_table_image.jpg")
+img = cv2.imread("testImage.jpg")
 Z = np.float32(img.reshape((-1,3)))
 
 criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 10, 1.0)
