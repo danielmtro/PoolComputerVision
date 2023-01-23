@@ -55,11 +55,9 @@ def isolate_bounding_box(contours, image, number_of_boxes=1):
         
             # Draw the bounding box
             image=cv2.rectangle(image,(x,y),(x+w,y+h),(0,0,255),2)
+            result = image[y: y + h, x: x + w]
             
-            
-            mask = np.zeros_like(image)
-            mask = cv2.rectangle(mask, (x,y),(x+w,y+h), (255,255,255), -1)
-            result = cv2.bitwise_and(image, mask)
+    
     
     return result 
 
@@ -79,6 +77,39 @@ def get_pool_table_contours(image):
     return contours, hierarchy
 
 
+def find_black_objects(img):
+    # Convert BGR to HSV
+
+    hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+
+    # define range of black color in HSV
+
+    lower_val = np.array([0,0,0])
+
+    upper_val = np.array([179,100,130])
+
+    # Threshold the HSV image to get only black colors
+
+    mask = cv2.inRange(hsv, lower_val, upper_val)
+
+    # Bitwise-AND mask and original image
+
+    res = cv2.bitwise_and(img,img, mask= mask)
+
+    # invert the mask to get black letters on white background
+
+    res2 = cv2.bitwise_not(mask)
+
+    # display image
+
+    cv2.imshow("img", res)
+
+    cv2.imshow("img2", res2)
+
+    cv2.waitKey(0)
+
+    cv2.destroyAllWindows()
+
 def main():
 
     img = cv2.imread("testImage.jpg")
@@ -88,7 +119,10 @@ def main():
     img = isolate_bounding_box(contours, img)
 
     hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-	
+
+    find_black_objects(img)
+
+
     # Threshold of green in HSV space
     lower_green = np.array([40, 40, 40])
     upper_green = np.array([70, 255, 255])
@@ -102,6 +136,13 @@ def main():
     
     result = cv2.cvtColor(result, cv2.COLOR_HSV2BGR)
     result = cv2.cvtColor(result, cv2.COLOR_BGR2GRAY)
+
+    while True:
+        cv2.imshow("iamge", result)
+        q = cv2.waitKey(1)
+        if q==ord("q"):
+            break
+    
 
     # Detect circles in the image using the HoughCircles function
     circles = cv2.HoughCircles(result, cv2.HOUGH_GRADIENT, 1, 50, param1=90, param2=13, minRadius=3, maxRadius=30)
